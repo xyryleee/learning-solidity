@@ -4,12 +4,15 @@
   "description": "Solidity starter for deploying on Avalanche C-Chain",
   "scripts": {
     "compile": "hardhat compile",
+    "test": "hardhat test",
     "deploy:fuji": "hardhat run scripts/deploy.js --network fuji",
     "deploy:mainnet": "hardhat run scripts/deploy.js --network avalanche",
-    "test": "hardhat test"
+    "verify:fuji": "hardhat run scripts/verify.js --network fuji",
+    "verify:mainnet": "hardhat run scripts/verify.js --network avalanche"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
     "hardhat": "^2.19.0"
   },
   "dependencies": {

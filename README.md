@@ -4,6 +4,64 @@ Solidity starter for deploying on **Avalanche C-Chain**, with a step-by-step lea
 
 ---
 
+## Join the workshop (optional)
+
+Want to be listed as a participant? Get a copy of this repo on your machine and add yourself to the roster.
+
+- **Get the repo:** Install [Git](https://git-scm.com/) (and [GitHub Desktop](https://desktop.github.com/) if you like), then click **Fork** on this repo and clone your fork:
+
+  `git clone https://github.com/YOUR_USERNAME/avalanche-smart-contract-starter.git`
+
+- **Add yourself:** In **Workshop participants** below, add one line with your name, GitHub handle, and what you do (e.g. developer, student). Save `README.md`.
+
+- **Send it back:** From the repo root run:
+
+  `git add . && git commit -m "Add myself to workshop participants" && git push origin main`
+
+  Then open a Pull Request into this repo. Use a title like: **Add [Your Name] to participants**.
+
+---
+
+## Workshop participants
+
+| Name | GitHub | Role / occupation |
+|------|--------|--------------------|
+|  |  |  |
+
+---
+
+## Submit your exercises
+
+Complete the exercises in the **`exercises/`** folder (Token, Staking, etc.) and submit your work via Pull Request.
+
+![Fork and Pull Request](images/Screenshot%202026-03-05%20at%2010.18.51.png)
+
+**How to submit:**
+
+1. Fork this repo and clone your fork.
+2. Solve the exercises in the `exercises/` subfolders (token, staking, nft, voting, escrow, multisig, auction, timelock). Each contract has TODOs only—you write the code.
+3. Commit and push to your fork.
+4. Open a **Pull Request** from your fork to this repo. Use a title like: **Your Name | Exercise submission (Token, Staking)**.
+
+---
+
+## Exercise folders
+
+| Folder | Topic | Description |
+|--------|--------|-------------|
+| [exercises/token/](exercises/token/) | Token | ERC20-style token: balanceOf, transfer |
+| [exercises/staking/](exercises/staking/) | Staking | Stake AVAX and withdraw later |
+| [exercises/nft/](exercises/nft/) | NFT | Mint and transfer (ERC721-style) |
+| [exercises/voting/](exercises/voting/) | Voting | On-chain proposals and voting |
+| [exercises/escrow/](exercises/escrow/) | Escrow | Hold funds; release to beneficiary |
+| [exercises/multisig/](exercises/multisig/) | Multisig | N-of-M owners approve then execute |
+| [exercises/auction/](exercises/auction/) | Auction | Highest bid wins; owner ends auction |
+| [exercises/timelock/](exercises/timelock/) | Timelock | Withdraw only after a delay |
+
+Each folder has a `README.md` (requirements) and a `.sol` file with **TODOs only**—no solution code. Implement the logic, deploy to Fuji, and share your contract address in the PR.
+
+---
+
 ## Learning path (easy access)
 
 | # | Topic | Path |
@@ -33,13 +91,16 @@ Each folder has a `.sol` file you can open, edit, and compile.
 
 ```bash
 npm install
+cp .env.example .env   # then add your PRIVATE_KEY
 npm run compile
+npm run test
 ```
+
+**Get testnet AVAX (Fuji):** Use the [Fuji faucet](https://faucet.avax.network/) so your deployer wallet has AVAX for gas.
 
 **Deploy to Avalanche Fuji testnet:**
 
 ```bash
-# Set in .env: PRIVATE_KEY, optional AVALANCHE_FUJI_RPC_URL
 npm run deploy:fuji
 ```
 
@@ -49,10 +110,25 @@ npm run deploy:fuji
 npm run deploy:mainnet
 ```
 
+**Verify on Snowtrace (after deploy):** Set `CONTRACT_ADDRESS` in `.env` to the deployed address, then:
+
+```bash
+npm run verify:fuji     # Fuji testnet
+# or
+npm run verify:mainnet  # Mainnet
+```
+
 ---
 
 ## Project layout
 
-- **`contracts/`** — Solidity sources (main apps + `learning/` lessons)
-- **`scripts/deploy.js`** — Deploys `AvalancheGreeter`
-- **`hardhat.config.js`** — Networks: `fuji` (43113), `avalanche` (43114)
+| Path | Description |
+|------|-------------|
+| `contracts/` | Solidity sources (`AvalancheGreeter`, `SimpleStorage`) |
+| `exercises/` | Submission folders: `token/`, `staking/`, `nft/`, `voting/`, `escrow/`, `multisig/`, `auction/`, `timelock/` (TODOs only) |
+| `learning/` | Numbered Solidity lessons (1-Intro … 16-Exercises) |
+| `scripts/deploy.js` | Deploys `AvalancheGreeter` |
+| `scripts/verify.js` | Verifies deployed contract on Snowtrace |
+| `test/` | Unit tests for main contracts |
+| `.env.example` | Env vars template (copy to `.env`) |
+| `hardhat.config.js` | Networks: `fuji` (43113), `avalanche` (43114) |
