@@ -1,18 +1,86 @@
+const fs = require("fs");
+const path = require("path");
+
 const hre = require("hardhat");
+
+function ensureDirSync(dirPath) {
+  if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
+}
 
 async function main() {
   const [deployer] = await hre.ethers.getSigners();
+  const networkName = hre.network.name;
+
   console.log("Deploying with account:", deployer.address);
-  console.log("Account balance:", (await hre.ethers.provider.getBalance(deployer.address)).toString());
+  console.log(
+    "Account balance:",
+    (await hre.ethers.provider.getBalance(deployer.address)).toString()
+  );
+  console.log("Network:", networkName);
 
-  const AvalancheGreeter = await hre.ethers.getContractFactory("AvalancheGreeter");
-  const greeter = await AvalancheGreeter.deploy("Hello, Avalanche!");
+  const argv = process.argv.slice(2);
+  const getArgValue = (flag) => {
+    const idx = argv.findIndex((x) => x === flag);
+    if (idx !== -1 && argv[idx + 1]) return argv[idx + 1];
+    const eq = argv.find((x) => x.startsWith(`${flag}=`));
+    if (eq) return eq.split("=").slice(1).join("=");
+    return undefined;
+  };
 
-  await greeter.waitForDeployment();
-  const address = await greeter.getAddress();
+  const contractName =
+    process.env.CONTRACT_NAME || getArgValue("--contract") || getArgValue("--name") || "AvalancheGreeter";
 
-  console.log("AvalancheGreeter deployed to:", address);
-  console.log("Network:", hre.network.name);
+  if (!process.env.CONTRACT_NAME && !getArgValue("--contract") && !getArgValue("--name")) {
+    console.log(`No contract specified; defaulting to "${contractName}".`);
+  }
+
+  // Only known constructor args we auto-fill by default.
+  const greeting = process.env.GREETING || "Hello, Avalanche!";
+  const constructorArgsJson = process.env.CONSTRUCTOR_ARGS_JSON || getArgValue("--constructor-args-json");
+
+  let constructorArgs = [];
+  if (constructorArgsJson) {
+    try {
+      constructorArgs = JSON.parse(constructorArgsJson);
+    } catch (e) {
+      console.error("Failed to parse CONSTRUCTOR_ARGS_JSON:", e);
+      process.exit(1);
+    }
+  } else if (contractName === "AvalancheGreeter") {
+    constructorArgs = [greeting];
+  }
+
+  const deploymentsDir = path.join(__dirname, "..", "deployments");
+  ensureDirSync(deploymentsDir);
+
+  const deployedFilePath = path.join(deploymentsDir, `${networkName}.json`);
+
+  const { chainId } = await hre.ethers.provider.getNetwork();
+
+  let deploymentsFile = null;
+  if (fs.existsSync(deployedFilePath)) {
+    deploymentsFile = JSON.parse(fs.readFileSync(deployedFilePath, "utf8"));
+  }
+
+  const result = deploymentsFile || {
+    network: networkName,
+    // ethers v6 may return chainId as BigInt; JSON cannot serialize BigInt.
+    chainId: chainId != null ? chainId.toString() : undefined,
+    deployedAt: new Date().toISOString(),
+    contracts: {},
+  };
+
+  const ContractFactory = await hre.ethers.getContractFactory(contractName);
+  const contract = await ContractFactory.deploy(...constructorArgs);
+  await contract.waitForDeployment();
+  const address = await contract.getAddress();
+
+  console.log(`${contractName} deployed to:`, address);
+
+  result.contracts = result.contracts || {};
+  result.contracts[contractName] = { address, constructorArgs };
+  fs.writeFileSync(deployedFilePath, JSON.stringify(result, null, 2), "utf8");
+  console.log("Deployment saved to:", deployedFilePath);
 }
 
 main()

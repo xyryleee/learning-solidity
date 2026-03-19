@@ -6,7 +6,8 @@ pragma solidity ^0.8.20;
  * @dev msg, block, tx — built-in globals
  */
 contract GlobalVariables {
-    function getGlobals() external view returns (
+    // Mark payable because we read `msg.value` (and Solidity enforces that).
+    function getGlobals() external payable returns (
         address sender,
         uint256 value,
         uint256 blockNum,
