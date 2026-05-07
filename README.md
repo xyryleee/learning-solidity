@@ -26,7 +26,7 @@ Want to be listed as a participant? Get a copy of this repo on your machine and 
 
 | Name | GitHub | Role / occupation |
 |------|--------|--------------------|
-|  |  |  |
+| Xyryle Adrian Cator | xyryleee | Student Developer |
 
 ---
 
